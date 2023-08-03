@@ -1,25 +1,28 @@
 import { modalController } from '@ionic/core';
-import { Component, Prop,State, h } from '@stencil/core';
-import { RemoveItemFromArray, ShowIonicAlert } from '../../utils/util';
+import { Component, ComponentInterface, Prop,State, h } from '@stencil/core';
+import { RemoveItemFromArray, ShowIonicAlert, ShowIonicEdit } from '../../utils/util';
 
 @Component({
   tag: 'app-calendar-detail',
   styleUrl: 'app-calendar-detail.css',
 })
-export class AppCalendarDetail {
+export class AppCalendarDetail implements ComponentInterface {
 
   @Prop() date: string;
   @State() notes: { date: string; note: string }[] = [];
 
-
   private noteText: string = ''; // Für die Notiz-Eingabe
   private textAreaElement: HTMLIonTextareaElement;
+
+  componentWillLoad() {
+    this.notes = JSON.parse(localStorage.getItem("notes")) || [];
+  }
+
+
   private saveNote(ev){
       ev.preventDefault();
-      this.notes =  JSON.parse(localStorage.getItem("notes")) || [];
       this.notes.push({date: this.date , note: this.noteText});
       localStorage.setItem("notes",JSON.stringify(this.notes));
-
       this.notes = [...this.notes];
       this.noteText = '';
       this.textAreaElement.value = this.noteText;
@@ -27,23 +30,29 @@ export class AppCalendarDetail {
 
   private deleteNote(itemPos){
     console.log(itemPos);
-    const notes =  JSON.parse(localStorage.getItem("notes")) || [];
-    this.notes = RemoveItemFromArray(notes,itemPos);
+    this.notes = RemoveItemFromArray(this.notes,itemPos);
     localStorage.setItem("notes",JSON.stringify(this.notes));
     this.notes = [...this.notes];
   }
 
-  private getNotes(date:string):{date: string,note: string}[]{
-     const notes =  JSON.parse(localStorage.getItem("notes")) || [];
-     console.log(notes);
-     this.notes = notes;
-     console.log(date);
-     const filteredNotes = this.notes.filter(note => (note.date === date));
-      console.log(filteredNotes);
-     return filteredNotes;
+  private editNote(itemPos: number, newNoteText: string) {
+    const notes = JSON.parse(localStorage.getItem("notes")) || [];
+    if (itemPos >= 0 && itemPos < notes.length) {
+      notes[itemPos].note = newNoteText;
+      localStorage.setItem("notes", JSON.stringify(notes)); // Speichern in LocalStorage
+      this.notes = [...notes];
+    }
   }
 
-
+  private async editItem(event, itemPos) {
+    event.preventDefault();
+    const result = await ShowIonicEdit("Edit Note", "Edit your note:", this.notes[itemPos].note);
+    if (result && result.data && result?.data?.values?.note) {
+      const newNoteText = result.data.values.note;
+      this.editNote(itemPos, newNoteText); 
+    } 
+  }
+  
 
 
   private async deleteItem(event,itemPos){
@@ -81,20 +90,20 @@ export class AppCalendarDetail {
       </ion-item>
     <ion-list>
       {
-        this.getNotes(this.date).map((note,index) => 
+        this.notes.map((note,index) => 
+        (this.date === note.date) &&
         <ion-item> 
           <ion-label>{note.note}</ion-label>
-
           <ion-buttons slot="end">
-            <ion-button >
+            <ion-button onClick={ev => this.editItem (ev,index )}>
               <ion-icon slot="icon-only" name="create-outline"></ion-icon>
             </ion-button>
             <ion-button onClick={ev => this.deleteItem(ev,index)}>
               <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
             </ion-button>
-          </ion-buttons>
+          </ion-buttons> 
          </ion-item>
-        )
+         )
       }
     </ion-list>
     </ion-content>

@@ -21,6 +21,7 @@ export class AppCalendar {
       <ion-content>
         <ion-header>
           <ion-toolbar>
+            <ion-title>Felix Praktikums Kalendar</ion-title>
             <ion-buttons slot="end">
               <ion-toggle onIonChange={(ev) => this.toggleDarkMode(ev)}>
                 {this.isDarkMode ? 'Light Mode' : 'Dark Mode'}
@@ -51,7 +52,6 @@ export class AppCalendar {
             <ion-list-header>
               {this.getMonthName(currentMonth)} {currentMonth.getFullYear()}
             </ion-list-header>
-            <ion-item-divider>Mo</ion-item-divider>
             <ion-row>
               {this.renderDays(currentMonth)}
             </ion-row>
@@ -75,18 +75,15 @@ export class AppCalendar {
       const isSelected = this.isSameDay(currentDay, this.selectedDate);
       const isToday = this.isSameDay(currentDay, this.currentDate);
 
-      console.log(currentDay.toDateString())
-
       days.push(
         <ion-col>
-          <ion-item onClick={(event) => this.openModal(event, currentDay.toDateString())}>
+          <ion-item button={true} onClick={(event) => this.openModal(event, currentDay.toDateString())}>
             <ion-label 
               class={{
                 'selected-day': isSelected,
                 'today': isToday
-              }}
-            >
-              {this.getDayName(currentDay)}
+              }}color={isToday? "danger" : "primary"}>
+              {(i+1) + " " + this.getDayName(currentDay)}
             </ion-label>
           </ion-item>
         </ion-col>
