@@ -69,6 +69,9 @@ export class PageHome {
             <ion-item href="/profile/ionic">
               <ion-label>Profile Page (/profile/ionic)</ion-label>
             </ion-item>
+            <ion-item href="/calendar">
+              <ion-label>Calendar</ion-label>
+            </ion-item>
           </ion-list>
         </ion-content>
       </Fragment>

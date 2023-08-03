@@ -6,6 +6,11 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface AppCalendar {
+    }
+    interface AppCalendarDetail {
+        "selectedDate": Date;
+    }
     interface AppRoot {
     }
     interface AppTabs {
@@ -19,6 +24,18 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLAppCalendarElement extends Components.AppCalendar, HTMLStencilElement {
+    }
+    var HTMLAppCalendarElement: {
+        prototype: HTMLAppCalendarElement;
+        new (): HTMLAppCalendarElement;
+    };
+    interface HTMLAppCalendarDetailElement extends Components.AppCalendarDetail, HTMLStencilElement {
+    }
+    var HTMLAppCalendarDetailElement: {
+        prototype: HTMLAppCalendarDetailElement;
+        new (): HTMLAppCalendarDetailElement;
+    };
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
     }
     var HTMLAppRootElement: {
@@ -50,6 +67,8 @@ declare global {
         new (): HTMLPageProfileElement;
     };
     interface HTMLElementTagNameMap {
+        "app-calendar": HTMLAppCalendarElement;
+        "app-calendar-detail": HTMLAppCalendarDetailElement;
         "app-root": HTMLAppRootElement;
         "app-tabs": HTMLAppTabsElement;
         "page-home": HTMLPageHomeElement;
@@ -58,6 +77,11 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    interface AppCalendar {
+    }
+    interface AppCalendarDetail {
+        "selectedDate"?: Date;
+    }
     interface AppRoot {
     }
     interface AppTabs {
@@ -70,6 +94,8 @@ declare namespace LocalJSX {
         "name"?: string;
     }
     interface IntrinsicElements {
+        "app-calendar": AppCalendar;
+        "app-calendar-detail": AppCalendarDetail;
         "app-root": AppRoot;
         "app-tabs": AppTabs;
         "page-home": PageHome;
@@ -81,6 +107,8 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "app-calendar": LocalJSX.AppCalendar & JSXBase.HTMLAttributes<HTMLAppCalendarElement>;
+            "app-calendar-detail": LocalJSX.AppCalendarDetail & JSXBase.HTMLAttributes<HTMLAppCalendarDetailElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
             "page-home": LocalJSX.PageHome & JSXBase.HTMLAttributes<HTMLPageHomeElement>;

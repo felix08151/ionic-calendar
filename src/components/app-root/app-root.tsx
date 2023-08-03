@@ -20,6 +20,7 @@ export class AppRoot {
             </ion-route>
           </ion-route>
           <ion-route url="/profile/:name" component="page-profile"></ion-route>
+          <ion-route url="/calendar" component="app-calendar"></ion-route>
         </ion-router>
         <ion-nav></ion-nav>
       </ion-app>
