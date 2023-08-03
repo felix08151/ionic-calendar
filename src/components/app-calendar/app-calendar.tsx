@@ -118,11 +118,10 @@ export class AppCalendar {
 
   private renderEventMenu() {
     if (!this.selectedDate) return null;
-
     return (<ion-menu side="end" content-id="main">
       <app-calendar-detail selectedDate={this.selectedDate} ></app-calendar-detail>
       </ion-menu>)
-      }
+  }
 
   private openEventMenu(event: any, date: Date) {
     this.selectedDate = date;
