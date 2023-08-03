@@ -9,7 +9,7 @@ export namespace Components {
     interface AppCalendar {
     }
     interface AppCalendarDetail {
-        "selectedDate": Date;
+        "date": string;
     }
     interface AppRoot {
     }
@@ -80,7 +80,7 @@ declare namespace LocalJSX {
     interface AppCalendar {
     }
     interface AppCalendarDetail {
-        "selectedDate"?: Date;
+        "date"?: string;
     }
     interface AppRoot {
     }

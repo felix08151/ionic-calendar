@@ -1,3 +1,4 @@
+import { modalController } from '@ionic/core';
 import { Component, h, State } from '@stencil/core';
 
 @Component({
@@ -32,7 +33,6 @@ export class AppCalendar {
             {this.renderMonths(monthsToShow)}
           </div>
         </div>
-        {this.renderEventMenu()}
       </ion-content>
     );
   }
@@ -75,9 +75,11 @@ export class AppCalendar {
       const isSelected = this.isSameDay(currentDay, this.selectedDate);
       const isToday = this.isSameDay(currentDay, this.currentDate);
 
+      console.log(currentDay.toDateString())
+
       days.push(
         <ion-col>
-          <ion-item onClick={(event) => this.openEventMenu(event, currentDay)}>
+          <ion-item onClick={(event) => this.openModal(event, currentDay.toDateString())}>
             <ion-label 
               class={{
                 'selected-day': isSelected,
@@ -116,24 +118,22 @@ export class AppCalendar {
     return dayNames[date.getDay()];
   }
 
-  private renderEventMenu() {
-    if (!this.selectedDate) return null;
-    return (<ion-menu side="end" content-id="main">
-      <app-calendar-detail selectedDate={this.selectedDate} ></app-calendar-detail>
-      </ion-menu>)
-  }
+  private async openModal(event: any, date: string){
+    event.preventDefault();
+    console.log(date);
+    const modal = await modalController.create({
+      component: "app-calendar-detail",
+      componentProps:{date}
+    });
 
-  private openEventMenu(event: any, date: Date) {
-    this.selectedDate = date;
-    const menu = document.querySelector('ion-menu');
-    if (menu) {
-      menu.contentId = 'main';
-      menu.open();
-      event.stopPropagation();
-    }
-  }
+    modal.present();
 
+    const { data, role } = await modal.onWillDismiss();
+
+    console.log(data,role);
+  }
   private toggleDarkMode(ev) {
+    console.log();
     const isDarkMode = ev.detail.checked;
     document.body.classList.toggle('dark', isDarkMode);
   }
