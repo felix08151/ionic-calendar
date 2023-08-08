@@ -19,5 +19,8 @@
     "jest-cli": "~27.4.5",
     "puppeteer": "^20.4.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^10.1.0"
+  }
 }

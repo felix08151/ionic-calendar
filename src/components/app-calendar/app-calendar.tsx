@@ -1,5 +1,6 @@
 import { modalController } from '@ionic/core';
 import { Component, h, State } from '@stencil/core';
+import { CloudStorage } from '../../services/cloudStorage.service';
 
 @Component({
   tag: 'app-calendar',
@@ -9,9 +10,12 @@ export class AppCalendar {
   @State() currentDate: Date;
   @State() selectedDate: Date | null = null;
   @State() isDarkMode: boolean = false;
-
-  componentWillLoad() {
+  @State() notes: {id:string, data:{date: string; note: string}}[] = [];
+  private cloudStorage: CloudStorage;
+  async componentWillLoad() {
     this.currentDate = new Date();
+    this.cloudStorage = new CloudStorage("notes");
+    this.notes = await this.cloudStorage.getDocs() || [];
   }
 
   render() {
@@ -74,6 +78,9 @@ export class AppCalendar {
 
       const isSelected = this.isSameDay(currentDay, this.selectedDate);
       const isToday = this.isSameDay(currentDay, this.currentDate);
+
+
+    
 
       days.push(
         <ion-col>

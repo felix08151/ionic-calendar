@@ -1,6 +1,7 @@
 import { modalController } from '@ionic/core';
 import { Component, ComponentInterface, Prop,State, h } from '@stencil/core';
-import { RemoveItemFromArray, ShowIonicAlert, ShowIonicEdit } from '../../utils/util';
+import { ShowIonicAlert, ShowIonicEdit } from '../../utils/util';
+import { CloudStorage } from '../../services/cloudStorage.service';
 
 @Component({
   tag: 'app-calendar-detail',
@@ -9,56 +10,51 @@ import { RemoveItemFromArray, ShowIonicAlert, ShowIonicEdit } from '../../utils/
 export class AppCalendarDetail implements ComponentInterface {
 
   @Prop() date: string;
-  @State() notes: { date: string; note: string }[] = [];
-
+  @State() notes: {id:string, data:{date: string; note: string}}[] = [];
   private noteText: string = ''; // Für die Notiz-Eingabe
   private textAreaElement: HTMLIonTextareaElement;
+  private cloudStorage: CloudStorage;
 
-  componentWillLoad() {
-    this.notes = JSON.parse(localStorage.getItem("notes")) || [];
+  async componentWillLoad() {
+     this.cloudStorage = new CloudStorage("notes");
+     this.notes = await this.cloudStorage.getDocs() || [];
   }
-
-
-  private saveNote(ev){
+  private async saveNote(ev){
       ev.preventDefault();
-      this.notes.push({date: this.date , note: this.noteText});
-      localStorage.setItem("notes",JSON.stringify(this.notes));
+      await this.cloudStorage.createDoc(await this.cloudStorage.createKey(),{date: this.date , note: this.noteText})
+      this.notes = await this.cloudStorage.getDocs() || [];
       this.notes = [...this.notes];
       this.noteText = '';
       this.textAreaElement.value = this.noteText;
+      this.notes = [...this.notes];
   }
 
-  private deleteNote(itemPos){
-    console.log(itemPos);
-    this.notes = RemoveItemFromArray(this.notes,itemPos);
-    localStorage.setItem("notes",JSON.stringify(this.notes));
+  private async deleteNote(id){
+    await this.cloudStorage.deleteDoc(id);
+    this.notes = await this.cloudStorage.getDocs() || [];
     this.notes = [...this.notes];
   }
 
-  private editNote(itemPos: number, newNoteText: string) {
-    const notes = JSON.parse(localStorage.getItem("notes")) || [];
-    if (itemPos >= 0 && itemPos < notes.length) {
-      notes[itemPos].note = newNoteText;
-      localStorage.setItem("notes", JSON.stringify(notes)); // Speichern in LocalStorage
-      this.notes = [...notes];
-    }
+  private async editNote(id: string, newNoteText: string) {
+    await this.cloudStorage.updateDoc(id,{date: this.date , note: newNoteText});
+    this.notes = await this.cloudStorage.getDocs() || [];
+    this.notes = [...this.notes];
   }
 
-  private async editItem(event, itemPos) {
+  private async editItem(event, id: string) {
     event.preventDefault();
-    const result = await ShowIonicEdit("Edit Note", "Edit your note:", this.notes[itemPos].note);
+    const editObject = this.notes.filter(note => note.id === id).pop();
+    const result = await ShowIonicEdit("Edit Note", "Edit your note:", editObject.data.note);
     if (result && result.data && result?.data?.values?.note) {
       const newNoteText = result.data.values.note;
-      this.editNote(itemPos, newNoteText); 
+      this.editNote(id, newNoteText); 
     } 
   }
   
-
-
-  private async deleteItem(event,itemPos){
+  private async deleteItem(event,id){
       event.preventDefault();
       await ShowIonicAlert('Löschen?',"Willst du wirklich diesen eintrag löschen?",() => {
-       this.deleteNote(itemPos);
+       this.deleteNote(id);
       })
   }
 
@@ -90,19 +86,18 @@ export class AppCalendarDetail implements ComponentInterface {
       </ion-item>
     <ion-list>
       {
-        this.notes.map((note,index) => 
-        (this.date === note.date) &&
-        <ion-item> 
-          <ion-label>{note.note}</ion-label>
-          <ion-buttons slot="end">
-            <ion-button onClick={ev => this.editItem (ev,index )}>
-              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-            </ion-button>
-            <ion-button onClick={ev => this.deleteItem(ev,index)}>
-              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons> 
-         </ion-item>
+        this.notes.filter(note => this.date === note.data.date).map((note) =>
+          <ion-item> 
+            <ion-label>{note.data.note}</ion-label>
+            <ion-buttons slot="end">
+              <ion-button onClick={ev => this.editItem (ev,note.id )}>
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button onClick={ev => this.deleteItem(ev,note.id)}>
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-buttons> 
+            </ion-item>
          )
       }
     </ion-list>

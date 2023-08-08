@@ -1,6 +1,25 @@
 app-calendar-detail {
   display: block;
-
+  .weekday-header {
+    text-align: center;
+  }
   
-
-}
+  .day-button {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border: none;
+    text-align: center;
+  }
+  
+  .today {
+    background-color: #ff9800; /* Beispiel für Hervorhebung des heutigen Tages */
+    color: white;
+  }
+  
+  .selected {
+    background-color: #2196f3; /* Beispiel für Hervorhebung des ausgewählten Tages */
+    color: white;
+  }
+  }
+  
